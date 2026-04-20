@@ -3,40 +3,60 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Un fetch</title>
+        <title>Un fetch - Corregido</title>
         <style>
-            body {
-                font-family: Helvetica, Arial, sans-serif;
-            }
+            body { font-family: Helvetica, Arial, sans-serif; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+            th { background-color: #f4f4f4; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
         </style>
     </head>
     <body>
-        <h1>Hola mundo</h1>
-		<table> </table>
-        <ol id="estudiantes"></ol>
+        <h1>Cursos Disponibles</h1>
+        <table id="miTabla">
+            <thead>
+                <tr>
+                    <th>Nombre del Curso</th>
+                    <th>Código</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
 
         <script>
-		
-		const t = document.querySelector("table")
-		
+            const t = document.querySelector("#miTabla tbody");
             const URL = "https://api.myjson.online/v1/records/36081a9c-0cca-42e6-a59f-2a1d0c51dc59";
+
             fetch(URL)
-			
-    .then((respuesta) => {
-        if (!respuesta.ok) {
-            throw new Error("Error HTTP: " + respuesta.status);
-        }
-        return respuesta.json();
-    })
-    .then((datos) => {
-        var trabajo = datos.data;
-        console.log("Datos recibidos:", trabajo);
-        trabajo.forEach((x) => {
-            if (x.ok == 1) {
-                t.innerHTML += `<tr><td>${x.name}</td></tr>`;
-            }
-        });
-    })
-    .catch((error) => {
-        console.error("Algo salió mal:", error);
-    });
+                .then((respuesta) => {
+                    if (!respuesta.ok) {
+                        throw new Error("Error HTTP: " + respuesta.status);
+                    }
+                    return respuesta.json();
+                })
+                .then((datos) => {
+    
+                    const trabajo = datos; 
+
+                    console.log("Datos recibidos:", trabajo);
+
+                    trabajo.forEach((x) => {
+                    
+                        // Si quieres ver SOLO los "ok: 1", mantén el if (x.ok == 1)
+                        if (x.ok == 1) {
+                            t.innerHTML += `
+                                <tr>
+                                    <td>${x.name}</td>
+                                    <td>${x.code}</td>
+                                </tr>`;
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error("Algo salió mal:", error);
+                });
+        </script>
+    </body>
+</html>
