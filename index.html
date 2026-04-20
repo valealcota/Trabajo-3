@@ -3,22 +3,25 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Un fetch - Corregido</title>
+        <title>Fetch JSON Corregido</title>
         <style>
-            body { font-family: Helvetica, Arial, sans-serif; padding: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-            th { background-color: #f4f4f4; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #333; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #007bff; color: white; }
+            tr:nth-child(even) { background-color: #f2f2f2; }
+            tr:hover { background-color: #e9f5ff; }
+            .status { font-weight: bold; color: #28a745; }
         </style>
     </head>
     <body>
-        <h1>Cursos Disponibles</h1>
-        <table id="miTabla">
+        <h1>Cursos con estado "OK" (1)</h1>
+        <table id="tabla-cursos">
             <thead>
                 <tr>
-                    <th>Nombre del Curso</th>
                     <th>Código</th>
+                    <th>Nombre de la Asignatura</th>
+                    <th>Enfoque</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,36 +29,48 @@
         </table>
 
         <script>
-            const t = document.querySelector("#miTabla tbody");
+            const tbody = document.querySelector("#tabla-cursos tbody");
+            // Usamos la URL que proporcionaste
             const URL = "https://api.myjson.online/v1/records/36081a9c-0cca-42e6-a59f-2a1d0c51dc59";
 
             fetch(URL)
-                .then((respuesta) => {
-                    if (!respuesta.ok) {
-                        throw new Error("Error HTTP: " + respuesta.status);
-                    }
+                .then(respuesta => {
+                    if (!respuesta.ok) throw new Error("Error en red");
                     return respuesta.json();
                 })
-                .then((datos) => {
-    
-                    const trabajo = datos; 
+                .then(resultado => {
+                    // IMPORTANTE: Esta API guarda tu lista dentro de resultado.data.json
+                    // o resultado.data dependiendo de cómo se guardó. 
+                    // Basado en el estándar de esa API, suele ser: resultado.data
+                    const listaCursos = resultado.data;
 
-                    console.log("Datos recibidos:", trabajo);
+                    console.log("Datos recibidos:", listaCursos);
 
-                    trabajo.forEach((x) => {
-                    
-                        // Si quieres ver SOLO los "ok: 1", mantén el if (x.ok == 1)
-                        if (x.ok == 1) {
-                            t.innerHTML += `
+                    // Limpiamos la tabla antes de insertar (por si acaso)
+                    tbody.innerHTML = "";
+
+                    listaCursos.forEach(curso => {
+                        // Forzamos la comparación a 1 (como número o string)
+                        if (curso.ok == 1) {
+                            const fila = `
                                 <tr>
-                                    <td>${x.name}</td>
-                                    <td>${x.code}</td>
+                                    <td>${curso.code}</td>
+                                    <td>${curso.name}</td>
+                                    <td>${curso.focus}</td>
                                 </tr>`;
+                            tbody.innerHTML += fila;
                         }
                     });
+
+                    // Si después de recorrer todo no hay nada, avisar en consola
+                    if (tbody.innerHTML === "") {
+                        console.warn("No se encontraron cursos con ok: 1");
+                        tbody.innerHTML = "<tr><td colspan='3'>No hay cursos seleccionados con '1'.</td></tr>";
+                    }
                 })
-                .catch((error) => {
-                    console.error("Algo salió mal:", error);
+                .catch(error => {
+                    console.error("Error cargando el JSON:", error);
+                    tbody.innerHTML = `<tr><td colspan='3' style='color:red'>Error: ${error.message}. Revisa la consola (F12).</td></tr>`;
                 });
         </script>
     </body>
